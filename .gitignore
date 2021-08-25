@@ -1,0 +1,17 @@
+# Github files and folders
+.git/
+**.md
+
+# Binaries
+bin/
+bin-int/
+
+# Visual Studio files and folders
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+
+# Dokus
+Doku/
