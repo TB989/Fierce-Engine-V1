@@ -7,6 +7,7 @@
 #include "EngineSettings.h"
 #include "src/system/event/EventSystem.h"
 #include "src/system/event/Event.h"
+#include "src/ecs/World.h"
 
 /* SystemIncludes*/
 
@@ -28,10 +29,10 @@ public:
 	void run();
 
 protected:
-	virtual void init() = 0;
-	virtual void update(float dt) = 0;
-	virtual void render() = 0;
-	virtual void cleanUp() = 0;
+	virtual void init(World* world) = 0;
+	virtual void update(World* world,float dt) = 0;
+	virtual void render(World* world) = 0;
+	virtual void cleanUp(World* world) = 0;
 
 private:
 	void coreInit();
@@ -42,7 +43,9 @@ private:
 	void onWindowClosed(WindowCloseEvent* event);
 
 private:
-	bool running = false;
+	bool running=false;
+
+	World* world;
 
 protected:
 	EngineSettings m_settings = {};

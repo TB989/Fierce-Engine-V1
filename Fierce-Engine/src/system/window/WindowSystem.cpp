@@ -79,7 +79,6 @@ WindowSystem::WindowSystem(Core* app, EngineSettings* settings){
 
 	m_dummyWindow = new FierceWindow(fierceDummyWindowClassName, L"FierceDummyWindow", m_settings,true);
 	m_window= new FierceWindow(fierceWindowClassName, L"FierceWindow", m_settings, false);
-
 	SetProp(m_window->getHandle(), L"windowSystem", this);
 }
 
@@ -109,11 +108,12 @@ FIERCE_ERROR WindowSystem::registerWindowClass(LPCWSTR className, WNDPROC wndPro
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = className;
-	wc.hIconSm = LoadIcon(hInstance, IDI_APPLICATION);
+	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
 	if (!RegisterClassEx(&wc)) {
 		return FE_WINDOW_ERROR;

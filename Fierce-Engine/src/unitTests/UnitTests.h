@@ -22,10 +22,10 @@ public:
 	Test_Setup();
 
 protected:
-	void init() override;
-	void update(float dt) override;
-	void render() override;
-	void cleanUp() override;
+	void init(World* world) override;
+	void update(World* world,float dt) override;
+	void render(World* world) override;
+	void cleanUp(World* world) override;
 };
 
 class Test_Rendering : public Core {
@@ -33,9 +33,11 @@ class Test_Rendering : public Core {
 public:
 	Test_Rendering();
 
+	void onKeyPressed(KeyDownEvent* event);
+
 protected:
-	void init() override;
-	void update(float dt) override;
-	void render() override;
-	void cleanUp() override;
+	void init(World* world) override;
+	void update(World* world,float dt) override;
+	void render(World* world) override;
+	void cleanUp(World* world) override;
 };

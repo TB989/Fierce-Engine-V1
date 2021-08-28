@@ -35,7 +35,8 @@ project "Fierce-Engine"
 	defines
 	{
 		"VK_USE_PLATFORM_WIN32_KHR",
-		"WIN32_LEAN_AND_MEAN"
+		"WIN32_LEAN_AND_MEAN",
+		"_USE_MATH_DEFINES"
 	}
 
 	files
@@ -66,7 +67,6 @@ project "Fierce-Engine"
 
 	links 
 	{ 
-                "OpenGL32.lib",
 		"vulkan-1.lib",
 		"d3d12.lib",
 		"dxgi.lib",

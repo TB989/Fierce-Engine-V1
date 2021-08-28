@@ -3,6 +3,9 @@
 #include "src/core/Exceptions.h"
 #include "src/system/logging/Logger.h"
 
+#include <windows.h>
+#include <strsafe.h>
+
 FierceWindow::FierceWindow(LPCWSTR className, LPCWSTR title, EngineSettings* settings,bool dummy) {
 	CHECK_FIERCE(createWindow(className, title, settings,dummy), "Failed to create window.");
 }
@@ -13,28 +16,23 @@ FierceWindow::~FierceWindow(){
 
 FIERCE_ERROR FierceWindow::createWindow(LPCWSTR className, LPCWSTR title, EngineSettings* settings, bool dummy) {
 	DWORD style=0;
-	DWORD exStyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
+	DWORD exStyle = WS_EX_APPWINDOW;
 
 	RECT r = RECT();
 	r.left = 0;
 	r.top = 0;
 
-	if (settings->windowMode==FULLSCREEN) {
+	if (settings->windowMode == WINDOWED || dummy) {
+		style = WS_OVERLAPPEDWINDOW;
+		r.right = settings->width;
+		r.bottom = settings->height;
+	}
+	else if (settings->windowMode==FULLSCREEN) {
 		style = WS_POPUP;
 		r.right = GetSystemMetrics(SM_CXSCREEN);
 		r.bottom = GetSystemMetrics(SM_CYSCREEN);
 		settings->width= GetSystemMetrics(SM_CXSCREEN);
 		settings->height= GetSystemMetrics(SM_CYSCREEN);
-	}
-	else if(settings->windowMode==WINDOWED){
-		style = WS_TILEDWINDOW;
-		r.right = settings->width;
-		r.bottom = settings->height;
-	}
-	else {
-		style = WS_TILEDWINDOW;
-		r.right = 0;
-		r.bottom = 0;
 	}
 
 	if (!AdjustWindowRectEx(&r, style, FALSE, exStyle)) {

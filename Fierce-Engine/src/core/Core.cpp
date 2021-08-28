@@ -20,6 +20,10 @@ Core::Core() {
 	Loggers::CORE->info("Starting event system.");
 	eventSystem = new EventSystem();
 	eventSystem->addListener(this, &Core::onWindowClosed);
+
+	//Create world
+	Loggers::CORE->info("Creating world.");
+	world = new World();
 }
 
 Core::~Core() {
@@ -55,26 +59,29 @@ void Core::coreInit() {
 		m_window = windowSystem->getWindow();
 	}
 
-	init();
+	init(world);
 }
 
 void Core::coreUpdate() {
-	update(0.0f);
+	update(world,0.0f);
 }
 
 void Core::coreRender() {
-	render();
+	render(world);
 }
 
 void Core::coreCleanUp() {
 	Loggers::CORE->info("Stopping engine.");
 
-	cleanUp();
+	cleanUp(world);
 
 	if (m_settings.windowMode != HEADLESS) {
 		Loggers::CORE->info("Stopping window system.");
 		delete windowSystem;
 	}
+
+	Loggers::CORE->info("Deleting world.");
+	delete world;
 
 	Loggers::CORE->info("Stopping event system.");
 	delete eventSystem;
