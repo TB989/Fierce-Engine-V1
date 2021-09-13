@@ -4,7 +4,7 @@
 
 int main() {
 	try {
-		Test_Setup app;
+		Test_Rendering_Vulkan app;
 		app.run();
 	}
 	catch (const Fierce_Exception& e) {
@@ -12,6 +12,14 @@ int main() {
 		return EXIT_FAILURE;
 	}
 	catch (const Win_Exception& e) {
+		Loggers::CORE->error(e.what());
+		return EXIT_FAILURE;
+	}
+	catch (const GL_Exception& e) {
+		Loggers::CORE->error(e.what());
+		return EXIT_FAILURE;
+	}
+	catch (const VK_Exception& e) {
 		Loggers::CORE->error(e.what());
 		return EXIT_FAILURE;
 	}

@@ -7,6 +7,7 @@
 #include "EngineSettings.h"
 #include "src/system/event/EventSystem.h"
 #include "src/system/event/Event.h"
+#include "src/system/render/abstract/RenderSystem.h"
 #include "src/ecs/World.h"
 
 /* SystemIncludes*/
@@ -48,11 +49,12 @@ private:
 	World* world;
 
 protected:
-	EngineSettings m_settings = {};
-
 	WindowSystem* windowSystem = nullptr;
 	FierceWindow* m_window = nullptr;
 
+	RenderSystem* renderSystem=nullptr;
+
 public:
+	EngineSettings m_settings = {};
 	EventSystem* eventSystem = nullptr;
 };

@@ -28,16 +28,30 @@ protected:
 	void cleanUp(World* world) override;
 };
 
-class Test_Rendering : public Core {
+class Test_Rendering_OpenGL : public Core {
 
 public:
-	Test_Rendering();
+	Test_Rendering_OpenGL();
 
 	void onKeyPressed(KeyDownEvent* event);
 
 protected:
 	void init(World* world) override;
 	void update(World* world,float dt) override;
+	void render(World* world) override;
+	void cleanUp(World* world) override;
+};
+
+class Test_Rendering_Vulkan : public Core {
+
+public:
+	Test_Rendering_Vulkan();
+
+	void onKeyPressed(KeyDownEvent* event);
+
+protected:
+	void init(World* world) override;
+	void update(World* world, float dt) override;
 	void render(World* world) override;
 	void cleanUp(World* world) override;
 };

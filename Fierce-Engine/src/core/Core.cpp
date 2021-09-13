@@ -3,7 +3,10 @@
 #include "src/system/logging/Logger.h"
 #include "src/system/window/WindowSystem.h"
 #include "src/system/window/FierceWindow.h"
+#include "src/system/render/openGL/GL_RenderSystem.h"
+#include "src/system/render/vulkan/VK_RenderSystem.h"
 #include "src/io/Parser.h"
+#include "src/core/Exceptions.h"
 
 Core::Core() {
 	//Load settings
@@ -57,6 +60,19 @@ void Core::coreInit() {
 		Loggers::CORE->info("Starting window system.");
 		windowSystem = new WindowSystem(this, &m_settings);
 		m_window = windowSystem->getWindow();
+
+		Loggers::CORE->info("Starting render system.");
+		switch (m_settings.api) {
+		case OPEN_GL:
+			renderSystem = new GL_RenderSystem(this);
+			break;
+		case VULKAN:
+			renderSystem = new VK_RenderSystem(this);
+			break;
+		case DIRECT_X:
+			CHECK_FIERCE(FE_NOT_SUPPORTED_ERROR,"DirectX is not supported yet.");
+			break;
+		}
 	}
 
 	init(world);
@@ -76,6 +92,9 @@ void Core::coreCleanUp() {
 	cleanUp(world);
 
 	if (m_settings.windowMode != HEADLESS) {
+		Loggers::CORE->info("Stopping render system.");
+		delete renderSystem;
+
 		Loggers::CORE->info("Stopping window system.");
 		delete windowSystem;
 	}

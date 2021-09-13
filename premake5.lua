@@ -67,6 +67,7 @@ project "Fierce-Engine"
 
 	links 
 	{ 
+		"OpenGL32.lib",
 		"vulkan-1.lib",
 		"d3d12.lib",
 		"dxgi.lib",
