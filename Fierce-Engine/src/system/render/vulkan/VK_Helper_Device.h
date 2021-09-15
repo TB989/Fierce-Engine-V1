@@ -134,70 +134,148 @@ public:
         Loggers::VK->info("Device: %s (%s)", data->deviceProperties.deviceName, deviceType.c_str());
     }
 
+    static void getSampleCounts(VkSampleCountFlags flags,std::string *samples) {
+        samples->clear();
+        if (flags & VK_SAMPLE_COUNT_1_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_1_BIT");
+        }
+        if (flags & VK_SAMPLE_COUNT_2_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_2_BIT");
+        }
+        if (flags & VK_SAMPLE_COUNT_4_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_4_BIT");
+        }
+        if (flags & VK_SAMPLE_COUNT_8_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_8_BIT");
+        }
+        if (flags & VK_SAMPLE_COUNT_16_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_16_BIT");
+        }
+        if (flags & VK_SAMPLE_COUNT_32_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_32_BIT");
+        }
+        if (flags & VK_SAMPLE_COUNT_64_BIT) {
+            samples->assign("VK_SAMPLE_COUNT_64_BIT");
+        }
+    }
+
+    static void printDeviceLimits(VK_Device::DeviceData* data) {
+        std::string flags = "";
+        Loggers::VK->info("Limits:");
+        Loggers::VK->info("\tBufferImageGranularity: %llu", data->deviceProperties.limits.bufferImageGranularity);
+        Loggers::VK->info("\tDiscreteQueuePriorities: %lu", data->deviceProperties.limits.discreteQueuePriorities);
+        getSampleCounts(data->deviceProperties.limits.framebufferColorSampleCounts,&flags);
+        Loggers::VK->info("\tFramebufferColorSampleCounts: %s", flags.c_str());
+        getSampleCounts(data->deviceProperties.limits.framebufferDepthSampleCounts, &flags);
+        Loggers::VK->info("\tFramebufferDepthSampleCounts: %s", flags.c_str());
+        getSampleCounts(data->deviceProperties.limits.framebufferNoAttachmentsSampleCounts, &flags);
+        Loggers::VK->info("\tFramebufferNoAttachmentsSampleCounts: %s", flags.c_str());
+        getSampleCounts(data->deviceProperties.limits.framebufferStencilSampleCounts, &flags);
+        Loggers::VK->info("\tFramebufferStencilSampleCounts: %s", flags.c_str());
+        Loggers::VK->info("\tLineWidthGranularity: %1.3f", data->deviceProperties.limits.lineWidthGranularity);
+        Loggers::VK->info("\tLineWidthRange: %1.3f", data->deviceProperties.limits.lineWidthRange);
+        Loggers::VK->info("\tMaxBoundDescriptorSets: %lu", data->deviceProperties.limits.maxBoundDescriptorSets);
+        Loggers::VK->info("\tMaxClipDistances: %lu", data->deviceProperties.limits.maxClipDistances);
+        Loggers::VK->info("\tMaxColorAttachments: %lu", data->deviceProperties.limits.maxColorAttachments);
+        Loggers::VK->info("\tMaxCombinedClipAndCullDistances: %lu", data->deviceProperties.limits.maxCombinedClipAndCullDistances);
+        Loggers::VK->info("\tMaxComputeSharedMemorySize: %lu", data->deviceProperties.limits.maxComputeSharedMemorySize);
+        Loggers::VK->info("\tMaxComputeWorkGroupCount: %lu", data->deviceProperties.limits.maxComputeWorkGroupCount);
+        Loggers::VK->info("\tMaxComputeWorkGroupInvocations: %lu", data->deviceProperties.limits.maxComputeWorkGroupInvocations);
+        Loggers::VK->info("\tMaxComputeWorkGroupSize: %lu", data->deviceProperties.limits.maxComputeWorkGroupSize);
+        Loggers::VK->info("\tMaxCullDistances: %lu", data->deviceProperties.limits.maxCullDistances);
+        Loggers::VK->info("\tMaxDescriptorSetInputAttachments: %lu", data->deviceProperties.limits.maxDescriptorSetInputAttachments);
+        Loggers::VK->info("\tMaxDescriptorSetSampledImages: %lu", data->deviceProperties.limits.maxDescriptorSetSampledImages);
+        Loggers::VK->info("\tMaxDescriptorSetSamplers: %lu", data->deviceProperties.limits.maxDescriptorSetSamplers);
+        Loggers::VK->info("\tMaxDescriptorSetStorageBuffers: %lu", data->deviceProperties.limits.maxDescriptorSetStorageBuffers);
+        Loggers::VK->info("\tMaxDescriptorSetStorageBuffersDynamic: %lu", data->deviceProperties.limits.maxDescriptorSetStorageBuffersDynamic);
+        Loggers::VK->info("\tMaxDescriptorSetStorageImages: %lu", data->deviceProperties.limits.maxDescriptorSetStorageImages);
+        Loggers::VK->info("\tMaxDescriptorSetUniformBuffers: %lu", data->deviceProperties.limits.maxDescriptorSetUniformBuffers);
+        Loggers::VK->info("\tMaxDescriptorSetUniformBuffersDynamic: %lu", data->deviceProperties.limits.maxDescriptorSetUniformBuffersDynamic);
+        Loggers::VK->info("\tMaxDrawIndexedIndexValue: %lu", data->deviceProperties.limits.maxDrawIndexedIndexValue);
+        Loggers::VK->info("\tMaxDrawIndirectCount: %lu", data->deviceProperties.limits.maxDrawIndirectCount);
+        Loggers::VK->info("\tMaxFragmentCombinedOutputResources: %lu", data->deviceProperties.limits.maxFragmentCombinedOutputResources);
+        Loggers::VK->info("\tMaxFragmentDualSrcAttachments: %lu", data->deviceProperties.limits.maxFragmentDualSrcAttachments);
+        Loggers::VK->info("\tMaxFragmentInputComponents: %lu", data->deviceProperties.limits.maxFragmentInputComponents);
+        Loggers::VK->info("\tMaxFragmentOutputAttachments: %lu", data->deviceProperties.limits.maxFragmentOutputAttachments);
+        Loggers::VK->info("\tMaxFramebufferHeight: %lu", data->deviceProperties.limits.maxFramebufferHeight);
+        Loggers::VK->info("\tMaxFramebufferLayers: %lu", data->deviceProperties.limits.maxFramebufferLayers);
+        Loggers::VK->info("\tMaxFramebufferWidth: %lu", data->deviceProperties.limits.maxFramebufferWidth);
+        Loggers::VK->info("\tMaxGeometryInputComponents: %lu", data->deviceProperties.limits.maxGeometryInputComponents);
+        Loggers::VK->info("\tMaxGeometryOutputComponents: %lu", data->deviceProperties.limits.maxGeometryOutputComponents);
+        Loggers::VK->info("\tMaxGeometryOutputVertices: %lu", data->deviceProperties.limits.maxGeometryOutputVertices);
+        Loggers::VK->info("\tMaxGeometryShaderInvocations: %lu", data->deviceProperties.limits.maxGeometryShaderInvocations);
+        Loggers::VK->info("\tMaxGeometryTotalOutputComponents: %lu", data->deviceProperties.limits.maxGeometryTotalOutputComponents);
+        Loggers::VK->info("\tMaxImageArrayLayers: %lu", data->deviceProperties.limits.maxImageArrayLayers);
+        Loggers::VK->info("\tMaxImageDimension1D: %lu", data->deviceProperties.limits.maxImageDimension1D);
+        Loggers::VK->info("\tMaxImageDimension2D: %lu", data->deviceProperties.limits.maxImageDimension2D);
+        Loggers::VK->info("\tMaxImageDimension3D: %lu", data->deviceProperties.limits.maxImageDimension3D);
+        Loggers::VK->info("\tMaxImageDimensionCube: %lu", data->deviceProperties.limits.maxImageDimensionCube);
+    }
+
     static void printDeviceFeatures(VK_Device::DeviceData* data) {
         Loggers::VK->info("Features:");
-        Loggers::VK->info("AlpahToOne: %d", data->deviceFeatures.alphaToOne);
-        Loggers::VK->info("DepthBiasClamp: %d", data->deviceFeatures.depthBiasClamp);
-        Loggers::VK->info("DepthBounds: %d", data->deviceFeatures.depthBounds);
-        Loggers::VK->info("DepthClamp: %d", data->deviceFeatures.depthClamp);
-        Loggers::VK->info("DrawIndirectFirstInstance: %d", data->deviceFeatures.drawIndirectFirstInstance);
-        Loggers::VK->info("DualSrcBlend: %d", data->deviceFeatures.dualSrcBlend);
-        Loggers::VK->info("FillModeNonSolid: %d", data->deviceFeatures.fillModeNonSolid);
-        Loggers::VK->info("FragmentStoresAndAtomics: %d", data->deviceFeatures.fragmentStoresAndAtomics);
-        Loggers::VK->info("FullDrawIndexUint32: %d", data->deviceFeatures.fullDrawIndexUint32);
-        Loggers::VK->info("GeometryShader: %d", data->deviceFeatures.geometryShader);
-        Loggers::VK->info("ImageCubeArray: %d", data->deviceFeatures.imageCubeArray);
-        Loggers::VK->info("IndependentBlend: %d", data->deviceFeatures.independentBlend);
-        Loggers::VK->info("InheritedQueries: %d", data->deviceFeatures.inheritedQueries);
-        Loggers::VK->info("LargePoints: %d", data->deviceFeatures.largePoints);
-        Loggers::VK->info("LogicOp: %d", data->deviceFeatures.logicOp);
-        Loggers::VK->info("MultiDrawIndirect: %d", data->deviceFeatures.multiDrawIndirect);
-        Loggers::VK->info("MultiViewport: %d", data->deviceFeatures.multiViewport);
-        Loggers::VK->info("OcclusionQueryPrecise: %d", data->deviceFeatures.occlusionQueryPrecise);
-        Loggers::VK->info("PipelineStatisticsQuery: %d", data->deviceFeatures.pipelineStatisticsQuery);
-        Loggers::VK->info("RobustBufferAccess: %d", data->deviceFeatures.robustBufferAccess);
-        Loggers::VK->info("SamplerAnisotropy: %d", data->deviceFeatures.samplerAnisotropy);
-        Loggers::VK->info("SampleRateShading: %d", data->deviceFeatures.sampleRateShading);
-        Loggers::VK->info("ShaderClipDistance: %d", data->deviceFeatures.shaderClipDistance);
-        Loggers::VK->info("ShaderCullDistance: %d", data->deviceFeatures.shaderCullDistance);
-        Loggers::VK->info("ShaderFloat64: %d", data->deviceFeatures.shaderFloat64);
-        Loggers::VK->info("ShaderImageGatherExtended: %d", data->deviceFeatures.shaderImageGatherExtended);
-        Loggers::VK->info("ShaderInt16: %d", data->deviceFeatures.shaderInt16);
-        Loggers::VK->info("ShaderInt64: %d", data->deviceFeatures.shaderInt64);
-        Loggers::VK->info("ShaderResourceMinLod: %d", data->deviceFeatures.shaderResourceMinLod);
-        Loggers::VK->info("ShaderResourceResidency: %d", data->deviceFeatures.shaderResourceResidency);
-        Loggers::VK->info("ShaderSampledImageArrayDynamicIndexing: %d", data->deviceFeatures.shaderSampledImageArrayDynamicIndexing);
-        Loggers::VK->info("ShaderStorageBufferArrayDynamicIndexing: %d", data->deviceFeatures.shaderStorageBufferArrayDynamicIndexing);
-        Loggers::VK->info("ShaderStorageImageArrayDynamicIndexing: %d", data->deviceFeatures.shaderStorageImageArrayDynamicIndexing);
-        Loggers::VK->info("ShaderStorageImageExtendedFormats: %d", data->deviceFeatures.shaderStorageImageExtendedFormats);
-        Loggers::VK->info("ShaderStorageImageMultisample: %d", data->deviceFeatures.shaderStorageImageMultisample);
-        Loggers::VK->info("ShaderStorageImageReadWithoutFormat: %d", data->deviceFeatures.shaderStorageImageReadWithoutFormat);
-        Loggers::VK->info("ShaderStorageImageWriteWithoutFormat: %d", data->deviceFeatures.shaderStorageImageWriteWithoutFormat);
-        Loggers::VK->info("ShaderTessellationAndGeometryPointSize: %d", data->deviceFeatures.shaderTessellationAndGeometryPointSize);
-        Loggers::VK->info("ShaderUniformBufferArrayDynamicIndexing: %d", data->deviceFeatures.shaderUniformBufferArrayDynamicIndexing);
-        Loggers::VK->info("SparseBinding: %d", data->deviceFeatures.sparseBinding);
-        Loggers::VK->info("SparseResidency2Samples: %d", data->deviceFeatures.sparseResidency2Samples);
-        Loggers::VK->info("SparseResidency4Samples: %d", data->deviceFeatures.sparseResidency4Samples);
-        Loggers::VK->info("SparseResidency8Samples: %d", data->deviceFeatures.sparseResidency8Samples);
-        Loggers::VK->info("SparseResidency16Samples: %d", data->deviceFeatures.sparseResidency16Samples);
-        Loggers::VK->info("SparseResidencyAliased: %d", data->deviceFeatures.sparseResidencyAliased);
-        Loggers::VK->info("SparseResidencyBuffer: %d", data->deviceFeatures.sparseResidencyBuffer);
-        Loggers::VK->info("SparseResidencyImage2D: %d", data->deviceFeatures.sparseResidencyImage2D);
-        Loggers::VK->info("SparseResidencyImage3D: %d", data->deviceFeatures.sparseResidencyImage3D);
-        Loggers::VK->info("TessellationShader: %d", data->deviceFeatures.tessellationShader);
-        Loggers::VK->info("TextureCompressionASTC_LDR: %d", data->deviceFeatures.textureCompressionASTC_LDR);
-        Loggers::VK->info("TextureCompressionBC: %d", data->deviceFeatures.textureCompressionBC);
-        Loggers::VK->info("TextureCompressionETC2: %d", data->deviceFeatures.textureCompressionETC2);
-        Loggers::VK->info("VariableMultisampleRate: %d", data->deviceFeatures.variableMultisampleRate);
-        Loggers::VK->info("VertexPipelineStoresAndAtomics: %d", data->deviceFeatures.vertexPipelineStoresAndAtomics);
-        Loggers::VK->info("WideLines: %d", data->deviceFeatures.wideLines);
+        Loggers::VK->info("\tAlpahToOne: %s", data->deviceFeatures.alphaToOne?"true":"false");
+        Loggers::VK->info("\tDepthBiasClamp: %s", data->deviceFeatures.depthBiasClamp ? "true" : "false");
+        Loggers::VK->info("\tDepthBounds: %s", data->deviceFeatures.depthBounds ? "true" : "false");
+        Loggers::VK->info("\tDepthClamp: %s", data->deviceFeatures.depthClamp ? "true" : "false");
+        Loggers::VK->info("\tDrawIndirectFirstInstance: %s", data->deviceFeatures.drawIndirectFirstInstance ? "true" : "false");
+        Loggers::VK->info("\tDualSrcBlend: %s", data->deviceFeatures.dualSrcBlend ? "true" : "false");
+        Loggers::VK->info("\tFillModeNonSolid: %s", data->deviceFeatures.fillModeNonSolid ? "true" : "false");
+        Loggers::VK->info("\tFragmentStoresAndAtomics: %s", data->deviceFeatures.fragmentStoresAndAtomics ? "true" : "false");
+        Loggers::VK->info("\tFullDrawIndexUint32: %s", data->deviceFeatures.fullDrawIndexUint32 ? "true" : "false");
+        Loggers::VK->info("\tGeometryShader: %s", data->deviceFeatures.geometryShader ? "true" : "false");
+        Loggers::VK->info("\tImageCubeArray: %s", data->deviceFeatures.imageCubeArray ? "true" : "false");
+        Loggers::VK->info("\tIndependentBlend: %s", data->deviceFeatures.independentBlend ? "true" : "false");
+        Loggers::VK->info("\tInheritedQueries: %s", data->deviceFeatures.inheritedQueries ? "true" : "false");
+        Loggers::VK->info("\tLargePoints: %s", data->deviceFeatures.largePoints ? "true" : "false");
+        Loggers::VK->info("\tLogicOp: %s", data->deviceFeatures.logicOp ? "true" : "false");
+        Loggers::VK->info("\tMultiDrawIndirect: %s", data->deviceFeatures.multiDrawIndirect ? "true" : "false");
+        Loggers::VK->info("\tMultiViewport: %s", data->deviceFeatures.multiViewport ? "true" : "false");
+        Loggers::VK->info("\tOcclusionQueryPrecise: %s", data->deviceFeatures.occlusionQueryPrecise ? "true" : "false");
+        Loggers::VK->info("\tPipelineStatisticsQuery: %s", data->deviceFeatures.pipelineStatisticsQuery ? "true" : "false");
+        Loggers::VK->info("\tRobustBufferAccess: %s", data->deviceFeatures.robustBufferAccess ? "true" : "false");
+        Loggers::VK->info("\tSamplerAnisotropy: %s", data->deviceFeatures.samplerAnisotropy ? "true" : "false");
+        Loggers::VK->info("\tSampleRateShading: %s", data->deviceFeatures.sampleRateShading ? "true" : "false");
+        Loggers::VK->info("\tShaderClipDistance: %s", data->deviceFeatures.shaderClipDistance ? "true" : "false");
+        Loggers::VK->info("\tShaderCullDistance: %s", data->deviceFeatures.shaderCullDistance ? "true" : "false");
+        Loggers::VK->info("\tShaderFloat64: %s", data->deviceFeatures.shaderFloat64 ? "true" : "false");
+        Loggers::VK->info("\tShaderImageGatherExtended: %s", data->deviceFeatures.shaderImageGatherExtended ? "true" : "false");
+        Loggers::VK->info("\tShaderInt16: %s", data->deviceFeatures.shaderInt16 ? "true" : "false");
+        Loggers::VK->info("\tShaderInt64: %s", data->deviceFeatures.shaderInt64 ? "true" : "false");
+        Loggers::VK->info("\tShaderResourceMinLod: %s", data->deviceFeatures.shaderResourceMinLod ? "true" : "false");
+        Loggers::VK->info("\tShaderResourceResidency: %s", data->deviceFeatures.shaderResourceResidency ? "true" : "false");
+        Loggers::VK->info("\tShaderSampledImageArrayDynamicIndexing: %s", data->deviceFeatures.shaderSampledImageArrayDynamicIndexing ? "true" : "false");
+        Loggers::VK->info("\tShaderStorageBufferArrayDynamicIndexing: %s", data->deviceFeatures.shaderStorageBufferArrayDynamicIndexing ? "true" : "false");
+        Loggers::VK->info("\tShaderStorageImageArrayDynamicIndexing: %s", data->deviceFeatures.shaderStorageImageArrayDynamicIndexing ? "true" : "false");
+        Loggers::VK->info("\tShaderStorageImageExtendedFormats: %s", data->deviceFeatures.shaderStorageImageExtendedFormats ? "true" : "false");
+        Loggers::VK->info("\tShaderStorageImageMultisample: %s", data->deviceFeatures.shaderStorageImageMultisample ? "true" : "false");
+        Loggers::VK->info("\tShaderStorageImageReadWithoutFormat: %s", data->deviceFeatures.shaderStorageImageReadWithoutFormat ? "true" : "false");
+        Loggers::VK->info("\tShaderStorageImageWriteWithoutFormat: %s", data->deviceFeatures.shaderStorageImageWriteWithoutFormat ? "true" : "false");
+        Loggers::VK->info("\tShaderTessellationAndGeometryPointSize: %s", data->deviceFeatures.shaderTessellationAndGeometryPointSize ? "true" : "false");
+        Loggers::VK->info("\tShaderUniformBufferArrayDynamicIndexing: %s", data->deviceFeatures.shaderUniformBufferArrayDynamicIndexing ? "true" : "false");
+        Loggers::VK->info("\tSparseBinding: %s", data->deviceFeatures.sparseBinding ? "true" : "false");
+        Loggers::VK->info("\tSparseResidency2Samples: %s", data->deviceFeatures.sparseResidency2Samples ? "true" : "false");
+        Loggers::VK->info("\tSparseResidency4Samples: %s", data->deviceFeatures.sparseResidency4Samples ? "true" : "false");
+        Loggers::VK->info("\tSparseResidency8Samples: %s", data->deviceFeatures.sparseResidency8Samples ? "true" : "false");
+        Loggers::VK->info("\tSparseResidency16Samples: %s", data->deviceFeatures.sparseResidency16Samples ? "true" : "false");
+        Loggers::VK->info("\tSparseResidencyAliased: %s", data->deviceFeatures.sparseResidencyAliased ? "true" : "false");
+        Loggers::VK->info("\tSparseResidencyBuffer: %s", data->deviceFeatures.sparseResidencyBuffer ? "true" : "false");
+        Loggers::VK->info("\tSparseResidencyImage2D: %s", data->deviceFeatures.sparseResidencyImage2D ? "true" : "false");
+        Loggers::VK->info("\tSparseResidencyImage3D: %s", data->deviceFeatures.sparseResidencyImage3D ? "true" : "false");
+        Loggers::VK->info("\tTessellationShader: %s", data->deviceFeatures.tessellationShader ? "true" : "false");
+        Loggers::VK->info("\tTextureCompressionASTC_LDR: %s", data->deviceFeatures.textureCompressionASTC_LDR ? "true" : "false");
+        Loggers::VK->info("\tTextureCompressionBC: %s", data->deviceFeatures.textureCompressionBC ? "true" : "false");
+        Loggers::VK->info("\tTextureCompressionETC2: %s", data->deviceFeatures.textureCompressionETC2 ? "true" : "false");
+        Loggers::VK->info("\tVariableMultisampleRate: %s", data->deviceFeatures.variableMultisampleRate ? "true" : "false");
+        Loggers::VK->info("\tVertexPipelineStoresAndAtomics: %s", data->deviceFeatures.vertexPipelineStoresAndAtomics ? "true" : "false");
+        Loggers::VK->info("\tWideLines: %s", data->deviceFeatures.wideLines ? "true" : "false");
     }
 
     static void printDeviceMemoryProperties(VK_Device::DeviceData* data) {
         Loggers::VK->info("Memory properties:");
         for (int i = 0;i< data->deviceMemoryProperties.memoryHeapCount;i++) {
             Loggers::VK->info("\tHeap %i:",i);
-            Loggers::VK->info("\tSize: %llu GB", data->deviceMemoryProperties.memoryHeaps[i].size/100000000);
+            Loggers::VK->info("\tMemory size: %llu GB", data->deviceMemoryProperties.memoryHeaps[i].size/100000000);
             std::string flags = "";
             if (data->deviceMemoryProperties.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) {
                 flags.append(" DEVICE_LOCAL_BIT");
@@ -205,38 +283,39 @@ public:
             if (data->deviceMemoryProperties.memoryHeaps[i].flags & VK_MEMORY_HEAP_MULTI_INSTANCE_BIT) {
                 flags.append(" MULTI_INSTANCE_BIT");
             }
-            Loggers::VK->info("\tFlags: %s", flags.c_str());
-            Loggers::VK->info("");
-        }
-        for (int i = 0; i < data->deviceMemoryProperties.memoryTypeCount; i++) {
-            Loggers::VK->info("\tType %i:", i);
-            Loggers::VK->info("\tHeap %i:", data->deviceMemoryProperties.memoryTypes[i].heapIndex);
-            std::string flags = "";
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags&VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
-                flags.append(" DEVICE_LOCAL_BIT");
+            Loggers::VK->info("\tHeap flags: %s", flags.c_str());
+
+            for (int j = 0; j < data->deviceMemoryProperties.memoryTypeCount; j++) {
+                if (data->deviceMemoryProperties.memoryTypes[j].heapIndex==i) {
+                    Loggers::VK->info("\tMemory type %i:", j);
+                    std::string flags = "";
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
+                        flags.append(" DEVICE_LOCAL_BIT");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+                        flags.append(" HOST_VISIBLE_BIT");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
+                        flags.append(" HOST_COHERENT_BIT");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) {
+                        flags.append(" HOST_CACHED_BIT");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) {
+                        flags.append(" LAZILY_ALLOCATED_BIT");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_PROTECTED_BIT) {
+                        flags.append(" PROTECTED_BIT");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD) {
+                        flags.append(" VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD");
+                    }
+                    if (data->deviceMemoryProperties.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD) {
+                        flags.append(" VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD");
+                    }
+                    Loggers::VK->info("\tMemory flags %s", flags.c_str());
+                }
             }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
-                flags.append(" HOST_VISIBLE_BIT");
-            }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
-                flags.append(" HOST_COHERENT_BIT");
-            }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) {
-                flags.append(" HOST_CACHED_BIT");
-            }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) {
-                flags.append(" LAZILY_ALLOCATED_BIT");
-            }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_PROTECTED_BIT) {
-                flags.append(" PROTECTED_BIT");
-            }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD) {
-                flags.append(" VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD");
-            }
-            if (data->deviceMemoryProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD) {
-                flags.append(" VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD");
-            }
-            Loggers::VK->info("\tFlags %s:", flags.c_str());
             Loggers::VK->info("");
         }
     }
@@ -244,8 +323,9 @@ public:
     static void printDeviceData(VK_Device::DeviceData* data) {
         Loggers::VK->info("##### Device Data #####");
         printDeviceProperties(data);
-        printDeviceFeatures(data);
-        printDeviceMemoryProperties(data);
+        printDeviceLimits(data);
+        //printDeviceFeatures(data);
+        //printDeviceMemoryProperties(data);
         Loggers::VK->info("#######################");
     }
 };
