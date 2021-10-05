@@ -49,22 +49,29 @@ public:
 		VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
 		std::vector<VkQueueFamilyProperties> queueFamilies;
 
+		int graphicsQueueIndex = -1;
+		int transferQueueIndex = -1;
+		int computeQueueIndex = -1;
+
+		bool isCompatible = true;
+	};
+
+	struct SurfaceData {
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
 		std::vector<VkSurfaceFormatKHR> surfaceFormats;
 		std::vector<VkPresentModeKHR> presentModes;
-
-		bool isCompatible = true;
-		int queueFamilyIndex = -1;
 
 		VkSurfaceFormatKHR swapchainFormat;
 		VkPresentModeKHR swapchainPresentMode;
 		VkExtent2D swapchainExtent;
 		int imageCount;
 		VkSurfaceTransformFlagBitsKHR swapchainTransform;
+
+		bool isCompatible = true;
 	};
 private:
 	void pickPhysicalDevice();
-	void checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData);
+	void checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData, SurfaceData* surfaceData);
 
 	void createLogicalDevice();
 

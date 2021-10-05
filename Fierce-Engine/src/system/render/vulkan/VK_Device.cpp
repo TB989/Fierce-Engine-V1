@@ -25,19 +25,23 @@ void VK_Device::pickPhysicalDevice() {
 
     for (VkPhysicalDevice device:supportedDevices) {
         DeviceData data = {};
-        VK_Helper_Device::getDeviceData(device,m_surface,&data);
-        VK_Helper_Device::printDeviceData(&data);
-        checkDeviceCompatibility(device,&data);
+        SurfaceData data2 = {};
+        VK_Helper_Device::getSurfaceData(device, m_surface, &data2);
+        VK_Helper_Device::getDeviceData(device,&data);
+
+        VK_Helper_Device::printDeviceData(&data,true,true,true,true,true);
+
+        checkDeviceCompatibility(device,&data,&data2);
     }
 }
 
-void VK_Device::checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData) {
+void VK_Device::checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData, SurfaceData* surfaceData) {
     checkExtensionSupport();
     checkValidationLayerSupport();
     VK_Helper_Device::checkGeneralDeviceSupport(device, deviceData);
     VK_Helper_Device::checkQueueSupport(device,m_surface,deviceData);
     //Check if extension is turned on
-    VK_Helper_Device::checkSwapchainSupport(device, deviceData);
+    VK_Helper_Device::checkSwapchainSupport(device, surfaceData);
 }
 
 void VK_Device::create() {
