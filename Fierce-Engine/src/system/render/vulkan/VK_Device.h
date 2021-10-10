@@ -82,10 +82,14 @@ private:
 private:
 	VkInstance m_instance=VK_NULL_HANDLE;
 	VkSurfaceKHR m_surface=VK_NULL_HANDLE;
+
 	VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
-	int queueFamilyIndex=-1;
-	VkDevice device;
-	VkQueue graphicsQueue;
+	DeviceData deviceData;
+	SurfaceData surfaceData;
+
+	VkDevice device=VK_NULL_HANDLE;
+	VkQueue graphicsQueue=VK_NULL_HANDLE;
+	VkQueue transferQueue = VK_NULL_HANDLE;
 
 private:
 	std::vector<VkExtensionProperties> supportedExtensions;

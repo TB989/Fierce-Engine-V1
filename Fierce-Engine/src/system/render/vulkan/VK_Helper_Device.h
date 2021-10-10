@@ -56,11 +56,15 @@ public:
     }
 
     static bool checkGeneralDeviceSupport(VkPhysicalDevice device, VK_Device::DeviceData* data) {
+        if (data->deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
+            data->isCompatible = false;
+            return false;
+        }
         return true;
     }
 
     static VkBool32 supportsPresent(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,int queueIndex) {
-        VkBool32 presentSupport = false;
+        VkBool32 presentSupport = VK_FALSE;
         CHECK_VK(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueIndex, surface, &presentSupport), "Failed to check presentation support.");
         return presentSupport;
     }
@@ -79,14 +83,18 @@ public:
         Loggers::VK->warn("No compatible queue family found.");
         data->isCompatible = false;
 
-        return true;
+        return false;
     }
 
     static bool checkSwapchainSupport(VkPhysicalDevice device, VK_Device::SurfaceData* data) {
+        bool formatComp = false;
+        bool presentComp = false;
+
         //Check surface format
         for (const auto& availableFormat : data->surfaceFormats) {
             if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
                 data->swapchainFormat = availableFormat;
+                formatComp = true;
             }
         }
 
@@ -94,6 +102,7 @@ public:
         for (const auto& availablePresentMode : data->presentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 data->swapchainPresentMode = availablePresentMode;
+                presentComp = true;
             }
         }
 
@@ -112,7 +121,11 @@ public:
 
         data->swapchainTransform = data->surfaceCapabilities.currentTransform;
 
-        return true;
+        if (!formatComp||!presentComp) {
+            data->isCompatible = false;
+        }
+
+        return formatComp&&presentComp;
     }
 
     static void printDeviceProperties(VK_Device::DeviceData* data) {
@@ -423,6 +436,48 @@ public:
             printDeviceMemoryProperties(data);
         if (printQueueFamilies)
             printDeviceQueueFamilies(data);
+        Loggers::VK->info("#######################");
+    }
+
+    static void printSurfaceData(VK_Device::SurfaceData* data) {
+        Loggers::VK->info("##### Surface Data #####");
+        Loggers::VK->info("\tMin extent: [%ul/%lu]", data->surfaceCapabilities.minImageExtent.width, data->surfaceCapabilities.minImageExtent.height);
+        Loggers::VK->info("\tMax extent: [%ul/%lu]", data->surfaceCapabilities.maxImageExtent.width, data->surfaceCapabilities.maxImageExtent.height);
+        Loggers::VK->info("\tFormats:");
+        for (VkSurfaceFormatKHR format:data->surfaceFormats) {
+            switch (format.format) {
+            case VK_FORMAT_B8G8R8A8_UNORM:
+                Loggers::VK->info("\tVK_FORMAT_B8G8R8A8_UNORM VK_COLOR_SPACE_SRGB_NONLINEAR_KHR");
+                break;
+            case VK_FORMAT_B8G8R8A8_SRGB:
+                Loggers::VK->info("\tVK_FORMAT_B8G8R8A8_SRGB VK_COLOR_SPACE_SRGB_NONLINEAR_KHR");
+                break;
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+                Loggers::VK->info("\tVK_FORMAT_A2B10G10R10_UNORM_PACK32 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR");
+                break;
+            default:
+                Loggers::VK->info("\t%i %i",format.format, format.colorSpace);
+                break;
+            }
+            
+        }
+        Loggers::VK->info("\tPresent modes:");
+        for (VkPresentModeKHR mode : data->presentModes) {
+            switch (mode) {
+            case VK_PRESENT_MODE_IMMEDIATE_KHR:
+                Loggers::VK->info("\tVK_PRESENT_MODE_IMMEDIATE_KHR");
+                break;
+            case VK_PRESENT_MODE_MAILBOX_KHR:
+                Loggers::VK->info("\tVK_PRESENT_MODE_MAILBOX_KHR");
+                break;
+            case VK_PRESENT_MODE_FIFO_KHR:
+                Loggers::VK->info("\tVK_PRESENT_MODE_FIFO_KHR");
+                break;
+            case VK_PRESENT_MODE_FIFO_RELAXED_KHR:
+                Loggers::VK->info("\tVK_PRESENT_MODE_FIFO_RELAXED_KHR");
+                break;
+            }
+        }
         Loggers::VK->info("#######################");
     }
 };

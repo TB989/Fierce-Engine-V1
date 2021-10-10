@@ -16,7 +16,7 @@ VK_Device::VK_Device(VkInstance instance, VkSurfaceKHR surface){
 }
 
 VK_Device::~VK_Device() {
-    //vkDestroyDevice(device, nullptr);
+    vkDestroyDevice(device, nullptr);
 }
 
 void VK_Device::pickPhysicalDevice() {
@@ -28,10 +28,13 @@ void VK_Device::pickPhysicalDevice() {
         SurfaceData data2 = {};
         VK_Helper_Device::getSurfaceData(device, m_surface, &data2);
         VK_Helper_Device::getDeviceData(device,&data);
-
-        VK_Helper_Device::printDeviceData(&data,true,true,true,true,true);
-
         checkDeviceCompatibility(device,&data,&data2);
+
+        if (data.isCompatible&&data2.isCompatible) {
+            m_physicalDevice = device;
+            deviceData = data;
+            surfaceData = data2;
+        }
     }
 }
 
@@ -46,14 +49,15 @@ void VK_Device::checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* de
 
 void VK_Device::create() {
     pickPhysicalDevice();
-    //createLogicalDevice();
-    //vkGetDeviceQueue(device, queueFamilyIndex, 0, &graphicsQueue);
+    createLogicalDevice();
+    vkGetDeviceQueue(device, deviceData.graphicsQueueIndex, 0, &graphicsQueue);
+    transferQueue = graphicsQueue;
 }
 
 void VK_Device::createLogicalDevice(){
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+    queueCreateInfo.queueFamilyIndex = deviceData.graphicsQueueIndex;
     queueCreateInfo.queueCount = 1;
     float queuePriority = 1.0f;
     queueCreateInfo.pQueuePriorities = &queuePriority;
