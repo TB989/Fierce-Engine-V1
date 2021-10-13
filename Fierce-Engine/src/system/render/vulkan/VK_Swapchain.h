@@ -4,9 +4,11 @@
 *  -Parent class
 *  -Objects: Object myObject;
 */
-#include "src/system/render/abstract/RenderingContext.h"
+#include "VK_Device.h"
 
 /* SystemIncludes*/
+#include "vulkan/vulkan.h"
+#include <Windows.h>
 
 /* Forward declarations: 
 *  -Pointers:  Pointer* myPointer;
@@ -15,20 +17,18 @@
 *              Pointer* MyFunction(Pointer* myPointer);
 *              Reference& MyFunction(Reference& myReference);
 */
-class Core;
-class VK_Instance;
-class VK_Surface;
-class VK_Device;
-class VK_Swapchain;
 
-class VK_Context:public RenderingContext {
+class VK_Swapchain{
 public:
-	VK_Context(Core* core);
-	~VK_Context();
+	VK_Swapchain(VK_Device* device,VkSurfaceKHR surface);
+	~VK_Swapchain();
+
+	void create();
+	VkSwapchainKHR getId() { return m_swapchain; }
 
 private:
-	VK_Instance* instance;
-	VK_Surface* surface;
-	VK_Device* device;
-	VK_Swapchain* swapchain;
+	VK_Device* m_device=nullptr;
+	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
+
+	VkSwapchainKHR m_swapchain=VK_NULL_HANDLE;
 };

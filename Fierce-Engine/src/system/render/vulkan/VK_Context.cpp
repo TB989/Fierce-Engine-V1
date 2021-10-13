@@ -4,6 +4,7 @@
 #include "VK_Instance.h"
 #include "VK_Surface.h"
 #include "VK_Device.h"
+#include "VK_Swapchain.h"
 
 VK_Context::VK_Context(Core* core){
 	instance = new VK_Instance(&(core->m_settings));
@@ -19,10 +20,18 @@ VK_Context::VK_Context(Core* core){
 	surface->create();
 
 	device = new VK_Device(instance->getId(),surface->getId());
+	device->addRequiredExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+	device->addDesiredValidationLayer("VK_LAYER_KHRONOS_validation");
 	device->create();
+	device->printEnabledExtensions();
+	device->printEnabledValidationLayers();
+
+	swapchain = new VK_Swapchain(device,surface->getId());
+	swapchain->create();
 }
 
 VK_Context::~VK_Context(){
+	delete swapchain;
 	delete device;
 	delete surface;
 	delete instance;

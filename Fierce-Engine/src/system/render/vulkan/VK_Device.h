@@ -69,6 +69,9 @@ public:
 
 		bool isCompatible = true;
 	};
+
+	SurfaceData* getSurfaceData() { return &surfaceData; }
+
 private:
 	void pickPhysicalDevice();
 	void checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData, SurfaceData* surfaceData);

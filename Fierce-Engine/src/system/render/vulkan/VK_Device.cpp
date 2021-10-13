@@ -11,8 +11,6 @@
 VK_Device::VK_Device(VkInstance instance, VkSurfaceKHR surface){
     m_instance = instance;
     m_surface = surface;
-    VK_Helper_Extensions_ValidationLayers::getExtensions(m_physicalDevice, &supportedExtensions);
-    VK_Helper_Extensions_ValidationLayers::getValidationLayers(m_physicalDevice, &supportedValidationLayers);
 }
 
 VK_Device::~VK_Device() {
@@ -26,6 +24,8 @@ void VK_Device::pickPhysicalDevice() {
     for (VkPhysicalDevice device:supportedDevices) {
         DeviceData data = {};
         SurfaceData data2 = {};
+        VK_Helper_Extensions_ValidationLayers::getExtensions(device, &supportedExtensions);
+        VK_Helper_Extensions_ValidationLayers::getValidationLayers(device, &supportedValidationLayers);
         VK_Helper_Device::getSurfaceData(device, m_surface, &data2);
         VK_Helper_Device::getDeviceData(device,&data);
         checkDeviceCompatibility(device,&data,&data2);
