@@ -6,6 +6,7 @@
 */
 #include "src/utils/FierceStrings.h"
 #include "VK_Helper_Extensions_ValidationLayers.h"
+#include "VK_CompatibilityChecks.h"
 
 /* SystemIncludes*/
 #include "vulkan/vulkan.h"
@@ -28,80 +29,32 @@ public:
 	~VK_Device();
 
 public:
-	void addRequiredExtension(const char* extension) { requiredExtensions.push_back(extension); }
-	void addDesiredExtension(const char* extension) { desiredExtensions.push_back(extension); }
-	void addRequiredValidationLayer(const char* layer) { requiredValidationLayers.push_back(layer); }
-	void addDesiredValidationLayer(const char* layer) { desiredValidationLayers.push_back(layer); }
+	void addCheck(VK_CompatibilityCheck_Device* check) { checks.push_back(check); }
 
 	void create();
 	VkDevice getDevice() { return device; }
 	VkQueue getQueue() { return graphicsQueue; }
 
-	void printSupportedExtensions() { VK_Helper_Extensions_ValidationLayers::printExtensions(false, "supported", &supportedExtensions); }
-	void printEnabledExtensions() { VK_Helper_Extensions_ValidationLayers::printExtensions(false, "enabled", &enabledExtensions); }
-	void printSupportedValidationLayers() { VK_Helper_Extensions_ValidationLayers::printValidationLayers(false, "supported", &supportedValidationLayers); }
-	void printEnabledValidationLayers() { VK_Helper_Extensions_ValidationLayers::printValidationLayers(false, "enabled", &enabledValidationLayers); }
-
-public:
-	struct DeviceData {
-		VkPhysicalDeviceProperties deviceProperties;
-		VkPhysicalDeviceFeatures deviceFeatures;
-		VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
-		std::vector<VkQueueFamilyProperties> queueFamilies;
-
-		int graphicsQueueIndex = -1;
-		int transferQueueIndex = -1;
-		int computeQueueIndex = -1;
-
-		bool isCompatible = true;
-	};
-
-	struct SurfaceData {
-		VkSurfaceCapabilitiesKHR surfaceCapabilities;
-		std::vector<VkSurfaceFormatKHR> surfaceFormats;
-		std::vector<VkPresentModeKHR> presentModes;
-
-		VkSurfaceFormatKHR swapchainFormat;
-		VkPresentModeKHR swapchainPresentMode;
-		VkExtent2D swapchainExtent;
-		int imageCount;
-		VkSurfaceTransformFlagBitsKHR swapchainTransform;
-
-		bool isCompatible = true;
-	};
-
 	SurfaceData* getSurfaceData() { return &surfaceData; }
 
 private:
 	void pickPhysicalDevice();
-	void checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData, SurfaceData* surfaceData);
+	bool checkDeviceCompatibility(ExtensionValidationLayerData* data, DeviceData* deviceData, SurfaceData* surfaceData);
 
 	void createLogicalDevice();
-
-private:
-	void checkExtensionSupport() { VK_Helper_Extensions_ValidationLayers::checkExtensionSupport(&supportedExtensions, &enabledExtensions, &requiredExtensions, &desiredExtensions); }
-	void checkValidationLayerSupport() { VK_Helper_Extensions_ValidationLayers::checkValidationLayerSupport(&supportedValidationLayers, &enabledValidationLayers, &requiredValidationLayers, &desiredValidationLayers); }
 
 private:
 	VkInstance m_instance=VK_NULL_HANDLE;
 	VkSurfaceKHR m_surface=VK_NULL_HANDLE;
 
+	std::vector<VK_CompatibilityCheck_Device*> checks;
+
 	VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
 	DeviceData deviceData;
 	SurfaceData surfaceData;
+	ExtensionValidationLayerData extensionLayerData;
 
 	VkDevice device=VK_NULL_HANDLE;
 	VkQueue graphicsQueue=VK_NULL_HANDLE;
 	VkQueue transferQueue = VK_NULL_HANDLE;
-
-private:
-	std::vector<VkExtensionProperties> supportedExtensions;
-	std::vector<const char*> requiredExtensions;
-	std::vector<const char*> desiredExtensions;
-	std::vector<const char*> enabledExtensions;
-
-	std::vector<VkLayerProperties> supportedValidationLayers;
-	std::vector<const char*> requiredValidationLayers;
-	std::vector<const char*> desiredValidationLayers;
-	std::vector<const char*> enabledValidationLayers;
 };

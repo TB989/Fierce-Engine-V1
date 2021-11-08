@@ -33,7 +33,7 @@ public:
         vkEnumeratePhysicalDevices(instance, &deviceCount, devices->data());
 	}
 
-    static void getDeviceData(VkPhysicalDevice device, VK_Device::DeviceData* data) {
+    static void getDeviceData(VkPhysicalDevice device, VkSurfaceKHR surface, DeviceData* data) {
         vkGetPhysicalDeviceProperties(device, &data->deviceProperties);
         vkGetPhysicalDeviceFeatures(device, &data->deviceFeatures);
         vkGetPhysicalDeviceMemoryProperties(device, &data->deviceMemoryProperties);
@@ -41,9 +41,20 @@ public:
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
         data->queueFamilies.resize(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, data->queueFamilies.data());
+
+        data->presentSupport.clear();
+        data->presentSupport.resize(queueFamilyCount);
+        for (int i = 0;i< queueFamilyCount;i++) {
+            VkBool32 supported;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &supported);
+
+            if (supported) {
+                data->presentSupport[i] = true;
+            }
+        }
     }
 
-    static void getSurfaceData(VkPhysicalDevice device, VkSurfaceKHR surface, VK_Device::SurfaceData* data) {
+    static void getSurfaceData(VkPhysicalDevice device, VkSurfaceKHR surface, SurfaceData* data) {
         CHECK_VK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &data->surfaceCapabilities), "Failed to get surface capabilities.");
         uint32_t formatCount;
         CHECK_VK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr), "Failed to get surface formats.");
@@ -55,80 +66,7 @@ public:
         CHECK_VK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, data->presentModes.data()), "Failed to get present modes.");
     }
 
-    static bool checkGeneralDeviceSupport(VkPhysicalDevice device, VK_Device::DeviceData* data) {
-        if (data->deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
-            data->isCompatible = false;
-            return false;
-        }
-        return true;
-    }
-
-    static VkBool32 supportsPresent(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,int queueIndex) {
-        VkBool32 presentSupport = VK_FALSE;
-        CHECK_VK(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueIndex, surface, &presentSupport), "Failed to check presentation support.");
-        return presentSupport;
-    }
-
-    static bool checkQueueSupport(VkPhysicalDevice device, VkSurfaceKHR surface,VK_Device::DeviceData* data) {
-        int i = 0;
-        for (VkQueueFamilyProperties queueFamily : data->queueFamilies) {
-            if ((queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) && (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) && supportsPresent(device, surface,i)) {
-                data->transferQueueIndex = i;
-                data->graphicsQueueIndex = i;
-                return true;
-            }
-            i++;
-        }
-
-        Loggers::VK->warn("No compatible queue family found.");
-        data->isCompatible = false;
-
-        return false;
-    }
-
-    static bool checkSwapchainSupport(VkPhysicalDevice device, VK_Device::SurfaceData* data) {
-        bool formatComp = false;
-        bool presentComp = false;
-
-        //Check surface format
-        for (const auto& availableFormat : data->surfaceFormats) {
-            if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-                data->swapchainFormat = availableFormat;
-                formatComp = true;
-            }
-        }
-
-        //Check present mode
-        for (const auto& availablePresentMode : data->presentModes) {
-            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-                data->swapchainPresentMode = availablePresentMode;
-                presentComp = true;
-            }
-        }
-
-        //Check swapchain extent
-        data->swapchainExtent = data->surfaceCapabilities.currentExtent;
-        data->swapchainExtent.width = max(data->swapchainExtent.width, data->surfaceCapabilities.minImageExtent.width);
-        data->swapchainExtent.width = min(data->swapchainExtent.width, data->surfaceCapabilities.maxImageExtent.width);
-        data->swapchainExtent.height = max(data->swapchainExtent.height, data->surfaceCapabilities.minImageExtent.height);
-        data->swapchainExtent.height = min(data->swapchainExtent.height, data->surfaceCapabilities.maxImageExtent.height);
-
-        //Check number of images
-        data->imageCount = data->surfaceCapabilities.minImageCount + 1;
-        if (data->surfaceCapabilities.maxImageCount > 0 && data->imageCount > data->surfaceCapabilities.maxImageCount) {
-            data->imageCount = data->surfaceCapabilities.maxImageCount;
-        }
-
-        data->swapchainTransform = data->surfaceCapabilities.currentTransform;
-
-        if (!formatComp||!presentComp) {
-            data->isCompatible = false;
-        }
-
-        return formatComp&&presentComp;
-    }
-
-    static void printDeviceProperties(VK_Device::DeviceData* data) {
+    static void printDeviceProperties(DeviceData* data) {
         std::string deviceType;
         switch (data->deviceProperties.deviceType) {
         case VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_OTHER:
@@ -175,7 +113,7 @@ public:
         }
     }
 
-    static void printDeviceLimits(VK_Device::DeviceData* data) {
+    static void printDeviceLimits(DeviceData* data) {
         std::string flags = "";
         Loggers::VK->info("Limits:");
         Loggers::VK->info("\tBufferImageGranularity: %llu", data->deviceProperties.limits.bufferImageGranularity);
@@ -291,7 +229,7 @@ public:
         Loggers::VK->info("\tViewportSubPixelBits: %lu", data->deviceProperties.limits.viewportSubPixelBits);
     }
 
-    static void printDeviceFeatures(VK_Device::DeviceData* data) {
+    static void printDeviceFeatures(DeviceData* data) {
         Loggers::VK->info("Features:");
         Loggers::VK->info("\tAlpahToOne: %s", data->deviceFeatures.alphaToOne?"true":"false");
         Loggers::VK->info("\tDepthBiasClamp: %s", data->deviceFeatures.depthBiasClamp ? "true" : "false");
@@ -350,7 +288,7 @@ public:
         Loggers::VK->info("\tWideLines: %s", data->deviceFeatures.wideLines ? "true" : "false");
     }
 
-    static void printDeviceMemoryProperties(VK_Device::DeviceData* data) {
+    static void printDeviceMemoryProperties(DeviceData* data) {
         Loggers::VK->info("Memory properties:");
         for (int i = 0;i< data->deviceMemoryProperties.memoryHeapCount;i++) {
             Loggers::VK->info("\tHeap %i:",i);
@@ -399,7 +337,7 @@ public:
         }
     }
 
-    static void printDeviceQueueFamilies(VK_Device::DeviceData* data) {
+    static void printDeviceQueueFamilies(DeviceData* data) {
         int counter = 0;
         Loggers::VK->info("Queue families:");
         for (VkQueueFamilyProperties family:data->queueFamilies) {
@@ -424,7 +362,7 @@ public:
         }
     }
 
-    static void printDeviceData(VK_Device::DeviceData* data,bool printProperties, bool printLimits, bool printFeatures, bool printMemoryProperties, bool printQueueFamilies) {
+    static void printDeviceData(DeviceData* data,bool printProperties, bool printLimits, bool printFeatures, bool printMemoryProperties, bool printQueueFamilies) {
         Loggers::VK->info("##### Device Data #####");
         if(printProperties)
             printDeviceProperties(data);
@@ -439,7 +377,7 @@ public:
         Loggers::VK->info("#######################");
     }
 
-    static void printSurfaceData(VK_Device::SurfaceData* data) {
+    static void printSurfaceData(SurfaceData* data) {
         Loggers::VK->info("##### Surface Data #####");
         Loggers::VK->info("\tMin extent: [%ul/%lu]", data->surfaceCapabilities.minImageExtent.width, data->surfaceCapabilities.minImageExtent.height);
         Loggers::VK->info("\tMax extent: [%ul/%lu]", data->surfaceCapabilities.maxImageExtent.width, data->surfaceCapabilities.maxImageExtent.height);

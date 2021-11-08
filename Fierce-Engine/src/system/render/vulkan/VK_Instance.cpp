@@ -8,8 +8,6 @@
 
 VK_Instance::VK_Instance(EngineSettings* settings) {
     API_VERSION= VK_MAKE_VERSION(settings->apiVersionMajor, settings->apiVersionMinor, 0);
-    VK_Helper_Extensions_ValidationLayers::getExtensions(nullptr,&supportedExtensions);
-    VK_Helper_Extensions_ValidationLayers::getValidationLayers(nullptr,&supportedValidationLayers);
 }
 
 VK_Instance::~VK_Instance() {
@@ -20,9 +18,15 @@ VK_Instance::~VK_Instance() {
 }
 
 void VK_Instance::create(){
-    checkExtensionSupport();
-    checkValidationLayerSupport();
-    isDebugSupported = VK_Helper_Extensions_ValidationLayers::isExtensionSupported(VK_EXT_DEBUG_UTILS_EXTENSION_NAME,&enabledExtensions);
+    extensionLayerData = {};
+    VK_Helper_Extensions_ValidationLayers::getExtensions(nullptr, &extensionLayerData.supportedExtensions);
+    VK_Helper_Extensions_ValidationLayers::getValidationLayers(nullptr, &extensionLayerData.supportedValidationLayers);
+
+    if (!checkInstanceCompatibility(&extensionLayerData, nullptr, nullptr)) {
+        CHECK_VK(VK_ERROR_INCOMPATIBLE_DRIVER,"Instance is incompatible.");
+    }
+
+    isDebugSupported = VK_Helper_Extensions_ValidationLayers::isExtensionSupported(VK_EXT_DEBUG_UTILS_EXTENSION_NAME,&extensionLayerData.enabledExtensions);
 
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -38,21 +42,21 @@ void VK_Instance::create(){
     createInfo.pNext = nullptr;
     createInfo.flags = 0;
     createInfo.pApplicationInfo = &appInfo;
-    if (enabledExtensions.empty()) {
+    if (extensionLayerData.enabledExtensions.empty()) {
         createInfo.enabledExtensionCount = 0;
         createInfo.ppEnabledExtensionNames = nullptr;
     }
     else {
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size());
-        createInfo.ppEnabledExtensionNames = enabledExtensions.data();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(extensionLayerData.enabledExtensions.size());
+        createInfo.ppEnabledExtensionNames = extensionLayerData.enabledExtensions.data();
     }
-    if (enabledValidationLayers.empty()) {
+    if (extensionLayerData.enabledValidationLayers.empty()) {
         createInfo.enabledLayerCount = 0;
         createInfo.ppEnabledLayerNames = nullptr;
     }
     else {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(enabledValidationLayers.size());
-        createInfo.ppEnabledLayerNames = enabledValidationLayers.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(extensionLayerData.enabledValidationLayers.size());
+        createInfo.ppEnabledLayerNames = extensionLayerData.enabledValidationLayers.data();
     }
 
     if (isDebugSupported) {
@@ -79,6 +83,16 @@ void VK_Instance::create(){
         Loggers::VK->info("Debug messenger is not active.");
         CHECK_VK(vkCreateInstance(&createInfo, nullptr, &instance), "Failed to create instance.");
     }
+}
+
+bool VK_Instance::checkInstanceCompatibility(ExtensionValidationLayerData* data, DeviceData* deviceData, SurfaceData* surfaceData){
+    for (auto mcheck : checks) {
+        if (!mcheck->check(data, deviceData, surfaceData)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 PFN_vkCreateDebugUtilsMessengerEXT VK_Instance::loadCreateFunctionPointer(VkInstance instance) {

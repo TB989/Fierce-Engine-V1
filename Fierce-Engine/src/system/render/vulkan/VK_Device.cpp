@@ -22,29 +22,32 @@ void VK_Device::pickPhysicalDevice() {
     VK_Helper_Device::getAllPhysicalDevices(m_instance,&supportedDevices);
 
     for (VkPhysicalDevice device:supportedDevices) {
-        DeviceData data = {};
-        SurfaceData data2 = {};
-        VK_Helper_Extensions_ValidationLayers::getExtensions(device, &supportedExtensions);
-        VK_Helper_Extensions_ValidationLayers::getValidationLayers(device, &supportedValidationLayers);
-        VK_Helper_Device::getSurfaceData(device, m_surface, &data2);
-        VK_Helper_Device::getDeviceData(device,&data);
-        checkDeviceCompatibility(device,&data,&data2);
+        deviceData = {};
+        surfaceData = {};
+        extensionLayerData = {};
 
-        if (data.isCompatible&&data2.isCompatible) {
+        VK_Helper_Extensions_ValidationLayers::getExtensions(device, &extensionLayerData.supportedExtensions);
+        VK_Helper_Extensions_ValidationLayers::getValidationLayers(device, &extensionLayerData.supportedValidationLayers);
+        VK_Helper_Device::getSurfaceData(device, m_surface, &surfaceData);
+        VK_Helper_Device::getDeviceData(device,m_surface,&deviceData);
+
+        if (checkDeviceCompatibility(&extensionLayerData, &deviceData, &surfaceData)) {
             m_physicalDevice = device;
-            deviceData = data;
-            surfaceData = data2;
+            return;
         }
     }
+
+    CHECK_VK(VK_ERROR_INCOMPATIBLE_DRIVER,"No compatible device found.");
 }
 
-void VK_Device::checkDeviceCompatibility(VkPhysicalDevice device, DeviceData* deviceData, SurfaceData* surfaceData) {
-    checkExtensionSupport();
-    checkValidationLayerSupport();
-    VK_Helper_Device::checkGeneralDeviceSupport(device, deviceData);
-    VK_Helper_Device::checkQueueSupport(device,m_surface,deviceData);
-    //Check if extension is turned on
-    VK_Helper_Device::checkSwapchainSupport(device, surfaceData);
+bool VK_Device::checkDeviceCompatibility(ExtensionValidationLayerData* data, DeviceData* deviceData, SurfaceData* surfaceData) {
+    for (auto mcheck : checks) {
+        if (!mcheck->check(data, deviceData, surfaceData)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void VK_Device::create() {
@@ -55,6 +58,9 @@ void VK_Device::create() {
 }
 
 void VK_Device::createLogicalDevice(){
+
+    VK_Helper_Extensions_ValidationLayers::printExtensions(false,"", &extensionLayerData.enabledExtensions);
+
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.queueFamilyIndex = deviceData.graphicsQueueIndex;
@@ -70,21 +76,21 @@ void VK_Device::createLogicalDevice(){
     createInfo.queueCreateInfoCount = 1;
     createInfo.pQueueCreateInfos = &queueCreateInfo;
     createInfo.pEnabledFeatures = &deviceFeatures;
-    if (enabledExtensions.empty()) {
+    if (extensionLayerData.enabledExtensions.empty()) {
         createInfo.enabledExtensionCount = 0;
         createInfo.ppEnabledExtensionNames = nullptr;
     }
     else {
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size());
-        createInfo.ppEnabledExtensionNames = enabledExtensions.data();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(extensionLayerData.enabledExtensions.size());
+        createInfo.ppEnabledExtensionNames = extensionLayerData.enabledExtensions.data();
     }
-    if (enabledValidationLayers.empty()) {
+    if (extensionLayerData.enabledValidationLayers.empty()) {
         createInfo.enabledLayerCount = 0;
         createInfo.ppEnabledLayerNames = nullptr;
     }
     else {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(enabledValidationLayers.size());
-        createInfo.ppEnabledLayerNames = enabledValidationLayers.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(extensionLayerData.enabledValidationLayers.size());
+        createInfo.ppEnabledLayerNames = extensionLayerData.enabledValidationLayers.data();
     }
 
     CHECK_VK(vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &device), "Failed to create logical device.");

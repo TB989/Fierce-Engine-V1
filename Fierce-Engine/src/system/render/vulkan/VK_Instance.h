@@ -6,6 +6,7 @@
 */
 #include "src/utils/FierceStrings.h"
 #include "VK_Helper_Extensions_ValidationLayers.h"
+#include "VK_CompatibilityChecks.h"
 
 /* SystemIncludes*/
 #include "vulkan/vulkan.h"
@@ -27,22 +28,13 @@ public:
 	~VK_Instance();
 
 public:
-	void addRequiredExtension(const char* extension) {requiredExtensions.push_back(extension);}
-	void addDesiredExtension(const char* extension) {desiredExtensions.push_back(extension);}
-	void addRequiredValidationLayer(const char* layer) {requiredValidationLayers.push_back(layer);}
-	void addDesiredValidationLayer(const char* layer) {desiredValidationLayers.push_back(layer);}
-
+	void addCheck(VK_CompatibilityCheck_Device* check) { checks.push_back(check); }
+	
 	void create();
 	VkInstance getId() {return instance;}
 
-	void printSupportedExtensions() { VK_Helper_Extensions_ValidationLayers::printExtensions(true, "supported",&supportedExtensions); }
-	void printEnabledExtensions() { VK_Helper_Extensions_ValidationLayers::printExtensions(true, "enabled", &enabledExtensions); }
-	void printSupportedValidationLayers() { VK_Helper_Extensions_ValidationLayers::printValidationLayers(true,"supported",&supportedValidationLayers); }
-	void printEnabledValidationLayers() { VK_Helper_Extensions_ValidationLayers::printValidationLayers(true,"enabled",&enabledValidationLayers); }
-
 private:
-	void checkExtensionSupport() { VK_Helper_Extensions_ValidationLayers::checkExtensionSupport(&supportedExtensions,&enabledExtensions,&requiredExtensions,&desiredExtensions); }
-	void checkValidationLayerSupport() { VK_Helper_Extensions_ValidationLayers::checkValidationLayerSupport(&supportedValidationLayers, &enabledValidationLayers, &requiredValidationLayers, &desiredValidationLayers); }
+	bool checkInstanceCompatibility(ExtensionValidationLayerData* data, DeviceData* deviceData, SurfaceData* surfaceData);
 
 	PFN_vkCreateDebugUtilsMessengerEXT loadCreateFunctionPointer(VkInstance instance);
 	PFN_vkDestroyDebugUtilsMessengerEXT loadDestroyFunctionPointer(VkInstance instance);
@@ -50,6 +42,10 @@ private:
 
 private:
 	VkInstance instance;
+
+	ExtensionValidationLayerData extensionLayerData;
+
+	std::vector<VK_CompatibilityCheck_Device*> checks;
 
 	bool isDebugSupported=false;
 	PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
@@ -62,15 +58,4 @@ private:
 	uint32_t APP_VERSION= VK_MAKE_VERSION(1, 0, 0);
 	std::string ENGINE_NAME = "FIERCE-ENGINE";
 	uint32_t ENGINE_VERSION = VK_MAKE_VERSION(1, 0, 0);
-
-private:
-	std::vector<VkExtensionProperties> supportedExtensions;
-	std::vector<const char*> requiredExtensions;
-	std::vector<const char*> desiredExtensions;
-	std::vector<const char*> enabledExtensions;
-
-	std::vector<VkLayerProperties> supportedValidationLayers;
-	std::vector<const char*> requiredValidationLayers;
-	std::vector<const char*> desiredValidationLayers;
-	std::vector<const char*> enabledValidationLayers;
 };
