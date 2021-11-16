@@ -17,10 +17,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
-IncludeDir["VULKAN"] = "C:/VulkanSDK/1.2.131.2/Include"
+IncludeDir["VULKAN"] = "C:/VulkanSDK/1.2.189.2/Include"
 IncludeDir["DIRECTX_DXGI"] = "C:/Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/shared"
 IncludeDir["DIRECTX_CORE"] = "C:/Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/um"
-IncludeDir["EXTERNAL"] = "C:/Users/Tobias/Desktop/FierceEngineV1/external"
+IncludeDir["EXTERNAL"] = "C:/Users/tmbal/Desktop/FierceEngineV1/external"
 
 project "Fierce-Engine"
 	location "Fierce-Engine"
@@ -61,7 +61,7 @@ project "Fierce-Engine"
 	
 	libdirs 
 	{ 
-		"C:/VulkanSDK/1.2.131.2/Lib",
+		"C:/VulkanSDK/1.2.189.2/Lib",
 		"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.18362.0/um/x64"
 	}
 
