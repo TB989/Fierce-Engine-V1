@@ -45,6 +45,8 @@ struct SurfaceData {
 
 	VkSurfaceFormatKHR swapchainFormat;
 	VkPresentModeKHR swapchainPresentMode;
+	uint32_t swapchainWidth;
+	uint32_t swapchainHeight;
 };
 
 class VK_CompatibilityCheck_Device{

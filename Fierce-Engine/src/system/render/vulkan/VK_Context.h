@@ -5,6 +5,7 @@
 *  -Objects: Object myObject;
 */
 #include "src/system/render/abstract/RenderingContext.h"
+#include "VK_Swapchain.h"
 
 /* SystemIncludes*/
 
@@ -19,12 +20,16 @@ class Core;
 class VK_Instance;
 class VK_Surface;
 class VK_Device;
-class VK_Swapchain;
 
 class VK_Context:public RenderingContext {
 public:
 	VK_Context(Core* core);
 	~VK_Context();
+
+	VK_Device* getDevice() { return device; }
+
+	VkImageView getSwapchainImage(int index) { return swapchain->getImage(index); }
+	int getNumSwapchainImages() { return swapchain->getNumImages(); }
 
 private:
 	VK_Instance* instance;

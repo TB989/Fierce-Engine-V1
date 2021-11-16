@@ -6,6 +6,7 @@
 */
 
 /* SystemIncludes*/
+#include "vulkan/vulkan.h"
 
 /* Forward declarations: 
 *  -Pointers:  Pointer* myPointer;
@@ -15,9 +16,15 @@
 *              Reference& MyFunction(Reference& myReference);
 */
 
-class RenderSystem{
+class VK_CommandBuffer{
+public:
+	VK_CommandBuffer(VkDevice device,VkCommandPool commandPool);
+	~VK_CommandBuffer();
+
+	void create();
+
 private:
-	virtual void createRenderpasses() = 0;
-	virtual void createFramebuffers()=0;
-	virtual void createCommandbuffers() = 0;
+	VkDevice mDevice;
+	VkCommandPool mCommandPool;
+	VkCommandBuffer buffer;
 };

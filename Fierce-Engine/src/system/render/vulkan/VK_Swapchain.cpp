@@ -8,6 +8,10 @@ VK_Swapchain::VK_Swapchain(VK_Device* device, VkSurfaceKHR surface){
 }
 
 VK_Swapchain::~VK_Swapchain(){
+	for (auto image:images) {
+		vkDestroyImageView(m_device->getDevice(), image, nullptr);
+	}
+
 	vkDestroySwapchainKHR(m_device->getDevice(), m_swapchain, nullptr);
 }
 
@@ -18,6 +22,9 @@ void VK_Swapchain::create(){
 	extent.width = min(extent.width, surfaceData->surfaceCapabilities.maxImageExtent.width);
 	extent.height = max(extent.height, surfaceData->surfaceCapabilities.minImageExtent.height);
 	extent.height = min(extent.height, surfaceData->surfaceCapabilities.maxImageExtent.height);
+
+	surfaceData->swapchainWidth = extent.width;
+	surfaceData->swapchainHeight = extent.height;
 
 	uint32_t imageCount = surfaceData->surfaceCapabilities.minImageCount + 1;
 	if (surfaceData->surfaceCapabilities.maxImageCount > 0 && imageCount > surfaceData->surfaceCapabilities.maxImageCount) {
@@ -45,4 +52,31 @@ void VK_Swapchain::create(){
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	CHECK_VK(vkCreateSwapchainKHR(m_device->getDevice(), &createInfo, nullptr, &m_swapchain), "Failed to create swapchain.");
+
+	CHECK_VK(vkGetSwapchainImagesKHR(m_device->getDevice(), m_swapchain, &imageCount, nullptr), "Failed to get swapchain images.");
+	std::vector<VkImage> swapChainImages;
+	swapChainImages.resize(imageCount);
+	CHECK_VK(vkGetSwapchainImagesKHR(m_device->getDevice(), m_swapchain, &imageCount, swapChainImages.data()), "Failed to get swapchain images.");
+
+	images.resize(swapChainImages.size());
+	for (size_t i = 0; i < swapChainImages.size(); i++) {
+		VkImageViewCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.image = swapChainImages[i];
+		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		createInfo.format = m_device->getSurfaceData()->swapchainFormat.format;
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
+
+		CHECK_VK(vkCreateImageView(m_device->getDevice(), &createInfo, nullptr, &images[i]), "Failed to create image view for swapchain.");
+	}
 }

@@ -25,4 +25,8 @@ public:
 
 private:
 	GL_Context* context;
+
+	void createRenderpasses();
+	void createFramebuffers();
+	void createCommandbuffers();
 };

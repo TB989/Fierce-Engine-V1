@@ -19,9 +19,7 @@
 *              Pointer* MyFunction(Pointer* myPointer);
 *              Reference& MyFunction(Reference& myReference);
 */
-//class VK_Renderpass;
-//class VK_Framebuffers;
-//class VK_Pipeline;
+class VK_CommandBuffer;
 
 class VK_Device{
 public:
@@ -37,11 +35,15 @@ public:
 
 	SurfaceData* getSurfaceData() { return &surfaceData; }
 
+	VK_CommandBuffer* getCommandBuffer();
+
 private:
 	void pickPhysicalDevice();
 	bool checkDeviceCompatibility(ExtensionValidationLayerData* data, DeviceData* deviceData, SurfaceData* surfaceData);
 
 	void createLogicalDevice();
+
+	void createCommandPool();
 
 private:
 	VkInstance m_instance=VK_NULL_HANDLE;
@@ -57,4 +59,6 @@ private:
 	VkDevice device=VK_NULL_HANDLE;
 	VkQueue graphicsQueue=VK_NULL_HANDLE;
 	VkQueue transferQueue = VK_NULL_HANDLE;
+
+	VkCommandPool commandPool;
 };

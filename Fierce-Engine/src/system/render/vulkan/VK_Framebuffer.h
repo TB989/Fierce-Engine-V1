@@ -4,11 +4,9 @@
 *  -Parent class
 *  -Objects: Object myObject;
 */
-#include "VK_Device.h"
 
 /* SystemIncludes*/
 #include "vulkan/vulkan.h"
-#include <Windows.h>
 #include <vector>
 
 /* Forward declarations: 
@@ -19,20 +17,21 @@
 *              Reference& MyFunction(Reference& myReference);
 */
 
-class VK_Swapchain{
+class VK_Device;
+
+class VK_Framebuffer{
 public:
-	VK_Swapchain(VK_Device* device,VkSurfaceKHR surface);
-	~VK_Swapchain();
+	VK_Framebuffer(VK_Device* device,VkRenderPass renderpass);
+	~VK_Framebuffer();
 
 	void create();
-	VkSwapchainKHR getId() { return m_swapchain; }
-	VkImageView getImage(int index) { return images[index]; }
-	int getNumImages() { return images.size(); }
+
+	void addAttachments(std::vector<VkImageView> attachments);
 
 private:
-	VK_Device* m_device=nullptr;
-	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
+	VK_Device* m_device;
+	VkRenderPass m_renderpass;
 
-	VkSwapchainKHR m_swapchain=VK_NULL_HANDLE;
-	std::vector<VkImageView> images;
+	VkFramebuffer framebuffer;
+	std::vector<VkImageView> m_attachments;
 };

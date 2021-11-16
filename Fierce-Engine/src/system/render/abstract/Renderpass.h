@@ -15,9 +15,6 @@
 *              Reference& MyFunction(Reference& myReference);
 */
 
-class RenderSystem{
-private:
-	virtual void createRenderpasses() = 0;
-	virtual void createFramebuffers()=0;
-	virtual void createCommandbuffers() = 0;
+class Renderpass{
+
 };
